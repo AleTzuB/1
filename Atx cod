@@ -1,0 +1,26 @@
+import requests
+import hashlib
+
+PAGES = [
+    "https://altex.ro/promo/extra-week/",
+    "https://altex.ro/promo/extra-weekend/",
+    "https://altex.ro/promo/extra-days/"
+]
+HEADERS = {"User-Agent": "Mozilla/5.0"}
+
+def get_page_hash(url):
+    response = requests.get(url, headers=HEADERS)
+    page_content = response.text
+    return hashlib.md5(page_content.encode()).hexdigest()
+
+# Salvează hash-ul inițial al fiecărei pagini
+previous_hashes = {url: get_page_hash(url) for url in PAGES}
+
+while True:
+    for url in PAGES:
+        current_hash = get_page_hash(url)
+        if current_hash != previous_hashes[url]:
+            print(f"❗ Pagina s-a schimbat: {url}")
+            previous_hashes[url] = current_hash
+        else:
+            print(f"Nicio schimbare pentru: {url}")
